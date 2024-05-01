@@ -1,6 +1,8 @@
 # vim:sw=2 syntax=asm
 .data
-
+win:.asciiz "W"
+loose:.asciiz "L"
+Tie:.asciiz "T"
 .text
   .globl play_game_once
 
@@ -20,4 +22,50 @@
 # Returns: Nothing, only print either character 'W', 'L', or 'T' to stdout
 play_game_once:
   # TODO
+ #t2 has 2 , t3 has 1 , t4 has 0 
+ 
+ addi $sp, $sp, -4     # Adjust stack pointer
+ sw   $ra, 0($sp)      # Save return address on stack
+ li $t2 2
+ li $t3 1 
+ li $t4 0 
+  jal gen_byte 
+  move $t5 $v0
+  jal gen_byte
+  move $t6 $v0 
+  beq $t5 $t6 equal
+  beq $t5 $t2 tohas2
+  beq $t5 $t3 tohas1
+  beq $t5 $t4 tohas0
+  
+  tohas2:
+  beq $t6 $t3 winn
+  beq $t6 $t4 looose
+  tohas1:
+  beq $t5 $t4 winn
+  beq $t5 $t2 looose
+  tohas0:
+  beq $t5 $t2 winn
+  beq $t5 $t3 looose
+  equal: #I am in EQUAL
+  li $v0 4 
+  la $a0 Tie
+  syscall
+  j end
+  
+  winn: #I am in WINN
+  la $a0 win
+  li $v0 4 
+  syscall
+  j end
+  
+  looose: #I am in looose
+  la $a0 loose 
+  li $v0 4 
+  syscall
+  j end
+  
+  end:
+  lw   $ra, 0($sp)      # Restore return address from stack
+  addi $sp, $sp, 4      # Restore stack pointer
   jr $ra

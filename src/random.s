@@ -1,6 +1,4 @@
-# vim:sw=2 syntax=asm
-.data
-
+#prints one random bit 
 .text
   .globl gen_byte, gen_bit
 
@@ -19,6 +17,23 @@
 #
 gen_byte:
   # TODO
+  addi $sp, $sp, -4     # Adjust stack pointer
+  sw   $ra, 0($sp)      # Save return address on stack
+  jal gen_bit 
+  move $t0 $v0 
+  bgtz $t0 oint1   # I Would be Entering 0 in t1  
+  jal gen_bit
+  move $t1 $v0
+  j end
+  oint1:           #Im in 0 in t1
+  jal gen_bit
+  move $t1 $v0
+  bgtz $t1 oint1
+  end:
+  sll $t0 $t0 1   #here Starts the end 
+  addu $v0 $t0 $t1 
+  lw   $ra, 0($sp)      # Restore return address from stack
+  addi $sp, $sp, 4      # Restore stack pointer
   jr $ra
 
 # Arguments:
@@ -35,5 +50,14 @@ gen_byte:
 #  Put the computed bit into $v0
 #
 gen_bit:
+
   # TODO
+  li $v0 40
+  la $a1 4($a0)
+  syscall
+  li $v0 41
+  li $a0 0
+  syscall
+  andi $v0 $a0 1 #random bit in $a0
   jr $ra
+

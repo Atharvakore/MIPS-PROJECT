@@ -19,6 +19,7 @@ configuration:
 main:
   li $s0 10
   la $a0 configuration
+  #jal start
   jal simulate_loop
   j terminate
 
@@ -32,3 +33,4 @@ simulate_loop: # One loop iteration
 terminate:
   li $v0 10
   syscall
+
