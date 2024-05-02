@@ -7,6 +7,8 @@ import ansicolors
 import pathlib
 import shutil
 
+import difflib
+
 from dataclasses import dataclass
 
 MARS_MAX_STEPS = 1000000
@@ -84,7 +86,8 @@ class MipsTest:
         flags_str = " ".join(mars_flags)
         sources = self.get_sources()
         sources_str = " ".join([ str(source) for source in sources])
-        return subprocess.run(shlex.split(f"{marsPath} {flags_str} {sources_str}"), check=False, capture_output=True)
+        #print (f"java -jar Mars4_5.jar {flags_str} {sources_str}")
+        return subprocess.run(shlex.split(f"java -jar Mars4_5.jar {flags_str} {sources_str}".replace("\\", "/")), check=False, capture_output=True)
 
     def execute_for_runtime(self, marsPath=MARS_PATH, mars_flags=mars_flags):
         mini = 32
@@ -113,12 +116,13 @@ class MipsTest:
         output = t.stdout
         if ret != 0:
             return TestResult(self.name, False, False, None, t.stderr.decode(), t.stdout.decode(), ret)
-        diffResult = subprocess.run(shlex.split(f"diff --strip-trailing-cr -w -q {self.reference_path} -"), check=False, capture_output=True, input=output)
-        if diffResult.returncode == 0:
+        #print (f"diff --strip-trailing-cr -w -q {self.reference_path} -")
+        expected_text = ''.join(open(self.reference_path).read())
+        if expected_text.replace("\n", "").replace("\r", "") == t.stdout.decode().replace("\n", "").replace("\r", "") :
             time_measure = self.execute_for_runtime(marsPath=MARS_PATH, mars_flags=mars_flags) if get_runtime else None
-            return TestResult(self.name, True, False, time_measure, t.stderr.decode(), t.stdout.decode(), ret)
+            return TestResult(self.name, True, False, time_measure, '\n', t.stdout.decode(), 0)
         else:
-            return TestResult(self.name, True, True, None, t.stderr.decode(), t.stdout.decode(), ret)
+            return TestResult(self.name, True, True, None, "\nExpected:\n" + expected_text, t.stdout.decode(), ret)
 
     def build_testbox(self):
         testbox = pathlib.Path('./debugbox')

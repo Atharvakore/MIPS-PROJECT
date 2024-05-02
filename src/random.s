@@ -19,16 +19,27 @@ gen_byte:
   # TODO
   addi $sp, $sp, -4     # Adjust stack pointer
   sw   $ra, 0($sp)      # Save return address on stack
+ 
+ # jal gen_bit 
+  #move $t0 $v0 
+   restart:
   jal gen_bit 
   move $t0 $v0 
-  bgtz $t0 oint1   # I Would be Entering 0 in t1  
   jal gen_bit
   move $t1 $v0
+  bgtz $t0 checkt0
   j end
-  oint1:           #Im in 0 in t1
-  jal gen_bit
-  move $t1 $v0
-  bgtz $t1 oint1
+  
+  
+  checkt0:
+  bgtz $t1 checkt1
+  j end
+  checkt1:
+  b restart
+  
+
+
+
   end:
   sll $t0 $t0 1   #here Starts the end 
   addu $v0 $t0 $t1 

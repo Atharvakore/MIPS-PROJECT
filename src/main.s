@@ -13,7 +13,7 @@ configuration:
   .byte 7       # column
   
 .text
-  .globl main
+ .globl main
 
 # Example main program that steps the ECA 10 times
 main:

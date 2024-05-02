@@ -66,7 +66,7 @@ for implementation in implementations:
                 implementation,
                 pathlib.Path(test_name + ".ref")
             )
-        results.append(test.run_test(get_runtime=bool(args.timing)))
+        results.append(test.run_test(get_runtime=bool(args.timing), marsPath=marsPath))
     if args.json:
         with open(args.json, "w") as f:
             test_suite = {
@@ -76,7 +76,7 @@ for implementation in implementations:
             f.writelines(json.dumps(test_suite))
     test_name_width = max(len(result.test_name) for result in results)
     for index, result in enumerate(results):
-        if not args.quiet: print(f" {'└' if index == len(results) - 1 else '├'}{result.test_name.ljust(test_name_width)}\t{result.verdict()}")
+        if not args.quiet: print(f" {'bb' if index == len(results) - 1 else 'dh'}{result.test_name.ljust(test_name_width)}\t{result.verdict()}")
         if args.verbose:
             if not args.quiet: print("Program output:")
             if not args.quiet: print(result.output, result.stderr)

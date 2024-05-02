@@ -42,11 +42,11 @@ play_game_once:
   beq $t6 $t3 winn
   beq $t6 $t4 looose
   tohas1:
-  beq $t5 $t4 winn
-  beq $t5 $t2 looose
+  beq $t6 $t4 winn
+  beq $t6 $t2 looose
   tohas0:
-  beq $t5 $t2 winn
-  beq $t5 $t3 looose
+  beq $t6 $t2 winn
+  beq $t6 $t3 looose
   equal: #I am in EQUAL
   li $v0 4 
   la $a0 Tie
