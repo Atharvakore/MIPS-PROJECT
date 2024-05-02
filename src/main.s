@@ -6,7 +6,7 @@
 # | 1 word |  1 word  |   1 byte   | 1 byte | 1 byte | 1 byte |
 configuration:
   .word 1       # eca
-  .word 836531  # tape
+  .word 836531     # tape
   .byte 20      # tape_len
   .byte 122     # rule
   .byte 5       # skip
@@ -19,8 +19,8 @@ configuration:
 main:
   li $s0 10
   la $a0 configuration
-  #jal start
-  jal simulate_loop
+ # jal print_tape
+   jal simulate_loop
   j terminate
 
 simulate_loop: # One loop iteration
