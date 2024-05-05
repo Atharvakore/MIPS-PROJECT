@@ -1,8 +1,11 @@
 # vim:sw=2 syntax=asm
+.data 
+.globl rule
+rule: .space 8
 
 .text
-  .globl simulate_automaton, print_tape
-
+  .globl simulate_automaton, print_tape,mutate ,makeruleaccesible
+   
  
 # Simulate one step of the cellular automaton
 # Arguments:
@@ -17,8 +20,195 @@
 # Returns: Nothing, but updates the tape in memory location 4($a0)
 simulate_automaton:
   # TODO
-  jr $ra
+  lw $a1 4($a0) #tape
+  lb $a2 8($a0) #tape-length
+  lb $a3 9($a0) # rule
+  add $sp $sp -4 
+  sw $ra 0($sp)   
+  jal makeruleaccesible
+  ### Every result would be stored in $t8 
+  # Oth Packet 
 
+andi $t1 $a1 1 #LSb in $t1
+srl $a1 $a1 1 
+andi $t2 $a1 1 #LLSb $t2
+sll $t2 $t2 1 
+add $t2 $t2 $t1
+sll $t2 $t2  1
+
+# MSB 
+add $t3 $a1 $0
+add $t4 $a2 -3
+srlv $t3 $t3 $t4
+andi $t3 $t3 1  #MSB in $t3 
+add $t8 $t2 $t3
+add $sp $sp -4
+sw $t8 0($sp)
+jal mutate 
+ ######################### 0th Packet works perfectly FINE
+ lb $a1 4($a0) #tape in $a0
+ #counter in $s2
+ li $s2 2
+ HiHa:
+ beq $s2 $a2 HiHaend
+ andi $t8 $a1 7
+ srl $a1 $a1 1 
+ add $sp $sp -4
+ sw $t8 0($sp)
+ jal mutate
+ add $s2 $s2 1
+ j HiHa
+  
+HiHaend:
+# MSB 
+add $t3 $a1 $0
+add $t4 $a2 -1
+srlv $t3 $t3 $t4
+andi $t3 $t3 1
+add $t8 $t2 $t3
+add $sp $sp -4
+sw $t8 0($sp)
+jal mutate
+# MSB end
+
+# Now to reverse digits of $v1 and then saving to $a0(4)
+ # $t0 has counter with tape length
+ li $t6 0 
+addu $t0 $v1 $0
+  reverse_loop:
+    andi $t1, $t0, 1
+    sll $t6, $t6, 1
+    or $t6, $t6, $t1
+    srl $t0, $t0, 1
+    bnez $t0, reverse_loop
+
+
+
+###Last
+  sw  $0    4($a0)
+  sw  $t6   4($a0)
+  lw $ra 0($sp)
+  add $sp $sp 4 
+  jr $ra
+        
+  
+  
+  ###############################################################
+  
+  mutate:
+  lw $t8 0($sp)
+  add $sp $sp 4
+  sll $v1 $v1 1 
+  li $t0 0
+  li $t1 1 
+  li $t2 2 
+  li $t3 3 
+  li $t4 4 
+  li $t5 5 
+  li $t6 6 
+  li $t7 7 
+  beq $t8 $t0 o_Index
+  beq $t8 $t1 one_Index
+  beq $t8 $t2 two_Index
+  beq $t8 $t3 three_Index
+  beq $t8 $t4 fourth_Index
+  beq $t8 $t5 fifth_Index
+  beq $t8 $t6 sixth_Index
+  beq $t8 $t7 seventh_Index
+  
+  o_Index:
+  lb $s1 rule
+  andi $s1 $s1 1
+  add $v1 $v1 $s1
+  li $s1 0 
+  j mutateend 
+  one_Index:
+  lb $s1 rule + 1 
+  andi $s1 $s1 1
+  add $v1 $v1 $s1
+  li $s1 0 
+  j mutateend 
+  two_Index:
+  lb $s1 rule + 2
+  andi $s1 $s1 1
+  add $v1 $v1 $s1
+  li $s1 0 
+  j mutateend 
+  three_Index:
+  lb $s1 rule + 3 
+  andi $s1 $s1 1
+  add $v1 $v1 $s1
+  li $s1 0 
+  j mutateend 
+  fourth_Index:
+   lb $s1 rule + 4
+  andi $s1 $s1 1
+  add $v1 $v1 $s1
+  li $s1 0 
+  j mutateend 
+  fifth_Index:
+   lb $s1 rule + 5
+  andi $s1 $s1 1
+  add $v1 $v1 $s1
+  li $s1 0 
+  j mutateend 
+  sixth_Index:
+   lb $s1 rule + 6
+  andi $s1 $s1 1
+  add $v1 $v1 $s1
+  li $s1 0
+  j mutateend 
+  seventh_Index:
+   lb $s1 rule + 7
+  andi $s1 $s1 1
+  add $v1 $v1 $s1
+  li $s1 0
+  j mutateend 
+  
+  
+  mutateend:
+  	
+  jr $ra
+ 
+ 
+ ##################################################################
+   makeruleaccesible:
+   add $t0 $a3 $0 # $t0 has copy of rule
+   andi $t1 $t0 1 
+   sb $t1 rule  
+   li $t1 0 
+   srl $t0 $t0 1 
+   andi $t1 $t0 1 
+   sb $t1 rule + 1
+   li $t1 0                         #Hiha Hiha Now the rule is easily accesible   101 %
+   srl $t0 $t0 1 
+   andi $t1 $t0 1 
+   sb $t1 rule + 2
+   li $t1 0 
+   srl $t0 $t0 1 
+   andi $t1 $t0 1 
+   sb $t1 rule + 3
+   li $t1 0 
+   srl $t0 $t0 1 
+   andi $t1 $t0 1 
+   sb $t1 rule + 4
+   li $t1 0 
+   srl $t0 $t0 1 
+   andi $t1 $t0 1 
+   sb $t1 rule + 5
+   li $t1 0 
+   srl $t0 $t0 1 
+   andi $t1 $t0 1 
+   sb $t1 rule + 6
+   li $t1 0 
+   srl $t0 $t0 1 
+   andi $t1 $t0 1 
+   sb $t1 rule + 7  
+   li $t1 0 
+   srl $t0 $t0 1 
+   li $t0 0 
+   jr $ra    
+   #####################################################################
 # Print the tape of the cellular automaton
 # Arguments:
 #     $a0 : address of configuration in memory
