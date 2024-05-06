@@ -4,7 +4,7 @@
 rule: .space 8
 
 .text
-  .globl simulate_automaton, print_tape,mutate ,makeruleaccesible
+  .globl simulate_automaton, print_tape
    
  
 # Simulate one step of the cellular automaton
@@ -18,8 +18,12 @@ rule: .space 8
 #  11($a0): column    (1 byte)
 #
 # Returns: Nothing, but updates the tape in memory location 4($a0)
+ 
+
+
 simulate_automaton:
   # TODO
+  li $v1 0
   lw $a1 4($a0) #tape
   lb $a2 8($a0) #tape-length
   lb $a3 9($a0) # rule
@@ -38,7 +42,7 @@ sll $t2 $t2  1
 
 # MSB 
 add $t3 $a1 $0
-add $t4 $a2 -3
+add $t4 $a2 -2
 srlv $t3 $t3 $t4
 andi $t3 $t3 1  #MSB in $t3 
 add $t8 $t2 $t3
@@ -60,28 +64,35 @@ jal mutate
  j HiHa
   
 HiHaend:
-# MSB 
+# LAST Packet 
+lw $a1 4($a0) #tape
+lb $a2 8($a0) #tape-length
 add $t3 $a1 $0
-add $t4 $a2 -1
-srlv $t3 $t3 $t4
+add $t4 $a2 -2
+srlv $t8 $t3 $t4
 andi $t3 $t3 1
-add $t8 $t2 $t3
+sll $t3 $t3 2
+add $t8 $t8 $t3
 add $sp $sp -4
 sw $t8 0($sp)
 jal mutate
-# MSB end
+# last packet end
 
 # Now to reverse digits of $v1 and then saving to $a0(4)
  # $t0 has counter with tape length
+  
  li $t6 0 
-addu $t0 $v1 $0
-  reverse_loop:
-    andi $t1, $t0, 1
-    sll $t6, $t6, 1
-    or $t6, $t6, $t1
-    srl $t0, $t0, 1
-    bnez $t0, reverse_loop
-
+ li $t6 0           # Initialize $t6 to store the result
+li $t7  8 
+addu $t0 $v1 $0   #######ERROR error 
+reverse_loop:
+    sll $t6, $t6, 1     # Shift left logical $t6 by 1 bit
+    andi $t1, $t0, 1    # Extract the least significant bit of $t0 and store it in $t1
+    add $t6, $t6, $t1    # Combine the extracted bit with $t6
+    srl $t0, $t0, 1     # Shift right logical $t0 by 1 bit
+    addi $t7, $t7, -1   # Decrement the bit counter
+    bnez $t7, reverse_loop  # Branch to reverse_loop if bit counter is not zero
+    
 
 
 ###Last
@@ -165,7 +176,7 @@ addu $t0 $v1 $0
   li $s1 0
   j mutateend 
   
-  
+ 
   mutateend:
   	
   jr $ra

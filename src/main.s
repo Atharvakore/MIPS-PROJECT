@@ -13,7 +13,7 @@ configuration:
   .byte 7       # column
   
 .text
- #.globl main
+ .globl main
 
 # Example main program that steps the ECA 10 times
 main:
@@ -27,8 +27,10 @@ simulate_loop: # One loop iteration
   beqz $s0 terminate
   subi $s0 $s0 1
   la $a0 configuration
-  #jal play_game_once
+  jal play_game_once
   j simulate_loop
+  jal print_tape
+  jal simulate_automaton
   
 terminate:
   li $v0 10
