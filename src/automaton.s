@@ -4,7 +4,7 @@
 rule: .space 8
 
 .text
-  .globl simulate_automaton, print_tape
+  .globl simulate_automaton, print_tape 
    
  
 # Simulate one step of the cellular automaton
@@ -23,6 +23,7 @@ rule: .space 8
 
 simulate_automaton:
   # TODO
+   
   li $v1 0
   lw $a1 4($a0) #tape
   lb $a2 8($a0) #tape-length
@@ -64,15 +65,19 @@ jal mutate
  j HiHa
   
 HiHaend:
+li $t0 0
+li $t1 0 
+
 # LAST Packet 
 lw $a1 4($a0) #tape
 lb $a2 8($a0) #tape-length
-add $t3 $a1 $0
-add $t4 $a2 -2
-srlv $t8 $t3 $t4
-andi $t3 $t3 1
-sll $t3 $t3 2
-add $t8 $t8 $t3
+andi $t0 $a1 1  #LSb
+sll $t0 $t0 2 #MSB for last packet
+add $a2 $a2 -2 
+srlv $a1 $a1 $a2
+andi $a1 $a1 3
+add $t0 $t0 $a1
+move $t8 $t0 
 add $sp $sp -4
 sw $t8 0($sp)
 jal mutate
@@ -80,10 +85,10 @@ jal mutate
 
 # Now to reverse digits of $v1 and then saving to $a0(4)
  # $t0 has counter with tape length
-  
+ lb $a2 8($a0) #tape-length 
  li $t6 0 
  li $t6 0           # Initialize $t6 to store the result
-li $t7  8 
+add $t7 $a2 $0   
 addu $t0 $v1 $0   #######ERROR error 
 reverse_loop:
     sll $t6, $t6, 1     # Shift left logical $t6 by 1 bit

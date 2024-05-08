@@ -6,20 +6,19 @@
 # | 1 word |  1 word  |   1 byte   | 1 byte | 1 byte | 1 byte |
 configuration:
   .word 1       # eca
-  .word 836531     # tape
+  .word 866531  # tape
   .byte 20      # tape_len
   .byte 122     # rule
   .byte 5       # skip
   .byte 7       # column
   
 .text
- .globl main
+  #.globl main
 
 # Example main program that steps the ECA 10 times
 main:
   li $s0 10
   la $a0 configuration
-  jal simulate_automaton
   jal simulate_loop
   j terminate
 
@@ -29,10 +28,7 @@ simulate_loop: # One loop iteration
   la $a0 configuration
   jal play_game_once
   j simulate_loop
-  jal print_tape
-  jal simulate_automaton
   
 terminate:
   li $v0 10
   syscall
-
