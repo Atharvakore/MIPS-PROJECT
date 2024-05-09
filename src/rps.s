@@ -29,14 +29,19 @@ play_game_once:
  sw $a0, arrr
  addi $sp, $sp, -4     # Adjust stack pointer
  sw   $ra, 0($sp)      # Save return address on stack
- li $t2 2
- li $t3 1 
- li $t4 0
+
   lw $a0, arrr 
   jal gen_byte 
   move $t5 $v0
+  add $sp $sp -4
+  sw $t5 0($sp)
   lw $a0, arrr
   jal gen_byte
+   li $t2 2
+  li $t3 1 
+  li $t4 0
+  lw $t5 0($sp)
+  add $sp $sp 4 
   move $t6 $v0 
   beq $t5 $t6 equal
   beq $t5 $t2 tohas2
