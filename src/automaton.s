@@ -51,7 +51,7 @@ add $sp $sp -4
 sw $t8 0($sp)
 jal mutate 
  ######################### 0th Packet works perfectly FINE
- lb $a1 4($a0) #tape in $a0
+ lw $a1 4($a0) #tape in $a1
  #counter in $s2
  li $s2 2
  HiHa:

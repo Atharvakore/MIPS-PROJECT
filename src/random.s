@@ -17,6 +17,7 @@
 #
 gen_byte:
   # TODO
+  
   addi $sp, $sp, -4     # Adjust stack pointer
   sw   $ra, 0($sp)      # Save return address on stack
  
@@ -24,9 +25,9 @@ gen_byte:
   #move $t0 $v0 
    restart:
   jal gen_bit 
-  move $t0 $v0 
+  move $t0 $v0 # use s register or stack pointer
   jal gen_bit
-  move $t1 $v0
+  move $t1 $v0 # use s register or stack pointer
   bgtz $t0 checkt0
   j end
   
@@ -61,7 +62,12 @@ gen_byte:
 #  Put the computed bit into $v0
 #
 gen_bit:
-
+ # load eca
+  
+  # load coulmn and skip 
+  # if eca is 0 previous bit generation else skip times simulate_automaton then  columnth bit of it . 
+  add $sp $sp 4
+  sw $ra 0($sp)
   # TODO
   li $v0 40
   la $a1 4($a0)
@@ -70,5 +76,7 @@ gen_bit:
   li $a0 0
   syscall
   andi $v0 $a0 1 #random bit in $a0
+  lw $ra 0($sp)
+  add $sp $sp 4
   jr $ra
 
