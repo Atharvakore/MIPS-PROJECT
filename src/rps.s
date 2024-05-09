@@ -1,5 +1,8 @@
 # vim:sw=2 syntax=asm
 .data
+.globl arrr
+arrr:
+.space 4
 win:.asciiz "W"
 loose:.asciiz "L"
 Tie:.asciiz "T"
@@ -23,14 +26,16 @@ Tie:.asciiz "T"
 play_game_once:
   # TODO
  #t2 has 2 , t3 has 1 , t4 has 0 
- 
+ sw $a0, arrr
  addi $sp, $sp, -4     # Adjust stack pointer
  sw   $ra, 0($sp)      # Save return address on stack
  li $t2 2
  li $t3 1 
- li $t4 0 
+ li $t4 0
+  lw $a0, arrr 
   jal gen_byte 
   move $t5 $v0
+  lw $a0, arrr
   jal gen_byte
   move $t6 $v0 
   beq $t5 $t6 equal

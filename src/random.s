@@ -23,18 +23,26 @@ gen_byte:
  # jal gen_bit 
   #move $t0 $v0 
    restart:
+  sw $a0, arrr
   jal gen_bit 
-  move $t0 $v0 
+  move $t0 $v0
+  add $sp $sp -4
+  sw $t0 0($sp)
+  lw $a0, arrr 
   jal gen_bit
+  lw $t0 0($sp)
+  add $sp $sp 4
   move $t1 $v0
   bgtz $t0 checkt0
   j end
   
   
   checkt0:
+  
   bgtz $t1 checkt1
   j end
   checkt1:
+  lw $a0 arrr
   b restart
   
 
@@ -61,15 +69,47 @@ gen_byte:
 #  Put the computed bit into $v0
 #
 gen_bit:
-
+  addi $sp $sp -4 
+  sw $ra 0($sp)
+  sw $a0, arrr
+  lw $a0, arrr
+  lw $t0 0($a0) #eca
+  beq $t0 $0 normal
+  lb $s6 10($a0) #skip
+  lb $s4 11($a0) #column
+  lw $s5 4($a0) #tape
+  lb $t9  8($a0) #tape_length
+  loopskip:
+  beqz $s6 loopskipend
+  jal simulate_automaton 
+  addi $s6 $s6 -1
+  j loopskip 
+   loopskipend:
+  
+     column:
+   lw $t0 4($a0) #updated tape
+   subiu $t9 $t9 1 
+   subu $t9 $t9 $s4
+   srlv $t0 $t0 $t9
+   andi $v0 $t0 1 
+   j endb
   # TODO
+  normal:
   li $v0 40
   la $a1 4($a0)
   syscall
   li $v0 41
   li $a0 0
   syscall
+  li $t0 0
   andi $v0 $a0 1 #random bit in $a0
-  jr $ra
+  j endb
+  
+   
+    
+ endb: 
+ lw $ra 0($sp) 
+ add $sp $sp 4
+ jr $ra
 
 
