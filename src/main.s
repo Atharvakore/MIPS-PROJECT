@@ -6,7 +6,7 @@
 # | 1 word |  1 word  |   1 byte   | 1 byte | 1 byte | 1 byte |
 configuration:
   .word 1       # eca
-  .word 866531  # tape
+  .word 836531  # tape
   .byte 20      # tape_len
   .byte 122     # rule
   .byte 5       # skip
@@ -32,3 +32,5 @@ simulate_loop: # One loop iteration
 terminate:
   li $v0 10
   syscall
+
+
